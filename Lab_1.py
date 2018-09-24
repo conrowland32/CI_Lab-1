@@ -1,10 +1,13 @@
 import sys
 import random
-from IO_Functions import read_training_data, build_hidden_layer
+from io_functions import read_training_data, build_layer
+from training_functions import forward_pass, backprop
 
 INPUT_DIMENSIONS = 3
 HIDDEN_LAYER_DIMENSIONS = 11
 OUTPUT_DIMENSIONS = 2
+MOMENTUM = 0.3
+LEARNING_RATE = 0.7
 
 
 def main():
@@ -13,8 +16,18 @@ def main():
         './assets/cross_data (3 inputs - 2 outputs).csv', INPUT_DIMENSIONS, OUTPUT_DIMENSIONS)
 
     # Read and build hidden layer from w1 and b1
-    hidden_layer = build_hidden_layer(
+    hidden_layer = build_layer(
         './assets/w1 (3 inputs - 11 nodes).csv', './assets/b1 (11 nodes).csv')
+
+    # Read and build output layer from w2 and b2
+    output_layer = build_layer(
+        './assets/w2 (from 11 to 2).csv', './assets/b2 (2 output nodes).csv')
+
+    # Train network for one epoch
+    for sample in training_data:
+        forward_pass(sample, hidden_layer, output_layer)
+        backprop(sample, hidden_layer,
+                 output_layer, MOMENTUM, LEARNING_RATE)
 
 
 if __name__ == '__main__':

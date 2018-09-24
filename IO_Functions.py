@@ -1,5 +1,5 @@
 import csv
-from Neuron import Neuron
+from neuron import Neuron
 
 
 def read_training_data(filename, input_dimensions, output_nodes):
@@ -22,21 +22,21 @@ def read_training_data(filename, input_dimensions, output_nodes):
     return training_data
 
 
-def build_hidden_layer(weights_filename, biases_filename):
-    hidden_layer = []
+def build_layer(weights_filename, biases_filename):
+    new_layer = []
 
     # Build neurons with starting weights
     with open(weights_filename, 'r') as weights_file:
         reader = csv.reader(weights_file)
         # Iterate CSV rows / neurons
         for row in reader:
-            new_neuron = Neuron('sigmoid')
+            new_neuron = Neuron()
             weights = []
             # Iterate weights
             for weight in row:
                 weights.append(float(weight))
             new_neuron.set_weights(weights)
-            hidden_layer.append(new_neuron)
+            new_layer.append(new_neuron)
 
     # Add starting biases
     with open(biases_filename, 'r') as biases_file:
@@ -44,6 +44,6 @@ def build_hidden_layer(weights_filename, biases_filename):
         # Iterate CSV rows / neurons
         for index, row in enumerate(reader):
             for bias in row:
-                hidden_layer[index].set_bias(float(bias))
+                new_layer[index].set_bias(float(bias))
 
-    return hidden_layer
+    return new_layer
