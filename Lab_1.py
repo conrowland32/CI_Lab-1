@@ -23,11 +23,34 @@ def main():
     output_layer = build_layer(
         './assets/w2 (from 11 to 2).csv', './assets/b2 (2 output nodes).csv')
 
+    for neuron in hidden_layer:
+        # print(neuron.weights, neuron.bias)
+        for weight in neuron.weights:
+            print(round(weight, 4), end=' ')
+        print('\t/  ', round(neuron.bias, 4))
+    for neuron in output_layer:
+        # print(neuron.weights, neuron.bias)
+        for weight in neuron.weights:
+            print(round(weight, 4), end=' ')
+        print('  /  ', round(neuron.bias, 4))
+    print('\n')
+
     # Train network for one epoch
     for sample in training_data:
         forward_pass(sample, hidden_layer, output_layer)
         backprop(sample, hidden_layer,
                  output_layer, MOMENTUM, LEARNING_RATE)
+
+    for neuron in hidden_layer:
+        # print(neuron.weights, neuron.bias)
+        for weight in neuron.weights:
+            print(round(weight, 4), end=' ')
+        print('\t/  ', round(neuron.bias, 4))
+    for neuron in output_layer:
+        # print(neuron.weights, neuron.bias)
+        for weight in neuron.weights:
+            print(round(weight, 4), end=' ')
+        print('  /  ', round(neuron.bias, 4))
 
 
 if __name__ == '__main__':
