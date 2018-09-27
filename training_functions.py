@@ -2,6 +2,8 @@ from neuron import Neuron
 
 
 def forward_pass(sample, hidden_layer, output_layer):
+    sum_squared_errors = 0
+
     # Calculate induced local field and output for each hidden neuron
     for neuron in hidden_layer:
         neuron.calc_v(sample, 'inputs')
@@ -12,6 +14,10 @@ def forward_pass(sample, hidden_layer, output_layer):
         neuron.calc_v(hidden_layer, 'neurons')
         neuron.calc_y()
         neuron.calc_e(sample[len(sample) - len(output_layer) + index])
+        sum_squared_errors += (neuron.e)**2
+
+    # Return SSE for current sample
+    return sum_squared_errors
 
 
 def backprop(sample, hidden_layer, output_layer, momentum, learning_rate):

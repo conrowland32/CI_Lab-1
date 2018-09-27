@@ -11,6 +11,8 @@ LEARNING_RATE = 0.7
 
 
 def main():
+    sum_squared_errors = 0
+
     # Read in training data from cross_data
     training_data = read_training_data(
         './assets/cross_data (3 inputs - 2 outputs).csv', INPUT_DIMENSIONS, OUTPUT_DIMENSIONS)
@@ -37,7 +39,7 @@ def main():
 
     # Train network for one epoch
     for sample in training_data:
-        forward_pass(sample, hidden_layer, output_layer)
+        sum_squared_errors += forward_pass(sample, hidden_layer, output_layer)
         backprop(sample, hidden_layer,
                  output_layer, MOMENTUM, LEARNING_RATE)
 
@@ -51,6 +53,7 @@ def main():
         for weight in neuron.weights:
             print(round(weight, 4), end=' ')
         print('  /  ', round(neuron.bias, 4))
+    print('SSE:  ', sum_squared_errors / (2 * len(training_data)))
 
 
 if __name__ == '__main__':
