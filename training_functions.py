@@ -1,7 +1,7 @@
 from neuron import Neuron
 
 
-def forward_pass(sample, hidden_layer, output_layer):
+def forward_pass(sample, hidden_layer, output_layer, test=False):
     sum_squared_errors = 0
 
     # Calculate induced local field and output for each hidden neuron
@@ -13,8 +13,11 @@ def forward_pass(sample, hidden_layer, output_layer):
     for index, neuron in enumerate(output_layer):
         neuron.calc_v(hidden_layer, 'neurons')
         neuron.calc_y()
-        neuron.calc_e(sample[len(sample) - len(output_layer) + index])
-        sum_squared_errors += (neuron.e)**2
+        if not test:
+            neuron.calc_e(sample[len(sample) - len(output_layer) + index])
+            sum_squared_errors += (neuron.e)**2
+        else:
+            return neuron.y
 
     # Return SSE for current sample
     return sum_squared_errors

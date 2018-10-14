@@ -22,7 +22,7 @@ def read_training_data(filename, input_dimensions, output_nodes):
     return training_data
 
 
-def build_layer(weights_filename, biases_filename):
+def build_layer(weights_filename, biases_filename, prev_layer_size):
     new_layer = []
 
     # Build neurons with starting weights
@@ -33,8 +33,8 @@ def build_layer(weights_filename, biases_filename):
             new_neuron = Neuron()
             weights = []
             # Iterate weights
-            for weight in row:
-                weights.append(float(weight))
+            for i in range(prev_layer_size):
+                weights.append(float(row[i]))
             new_neuron.set_weights(weights)
             new_layer.append(new_neuron)
 
