@@ -49,6 +49,7 @@ def main():
 
     # # Plot sum of squared errors
     # pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'b.-')
+    # pyplot.title('3-Feature Training Errors')
     # pyplot.xlabel('Training Epoch')
     # pyplot.ylabel('Sum of Squared Errors')
     # pyplot.savefig('test_results/3-feature_sse.png')
@@ -75,6 +76,7 @@ def main():
     #         sample, hidden_layer, output_layer, True))
 
     # pyplot.scatter(square_x, square_y, c=square_colors, alpha=0.1)
+    # pyplot.title('3-Feature Classifications')
     # pyplot.xlabel('Feature 1')
     # pyplot.ylabel('Feature 2')
     # pyplot.savefig('test_results/3-feature_classifications.png')
@@ -112,6 +114,7 @@ def main():
 
     # # Plot sum of squared errors
     # pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'b.-')
+    # pyplot.title('2-Feature Training Errors')
     # pyplot.xlabel('Training Epoch')
     # pyplot.ylabel('Sum of Squared Errors')
     # pyplot.savefig('test_results/2-feature_sse.png')
@@ -138,14 +141,77 @@ def main():
     #         sample, hidden_layer, output_layer, True))
 
     # pyplot.scatter(square_x, square_y, c=square_colors, alpha=0.1)
+    # pyplot.title('2-Feature Classifications')
     # pyplot.xlabel('Feature 1')
     # pyplot.ylabel('Feature 2')
     # pyplot.savefig('test_results/2-feature_classifications.png')
     # pyplot.clf()
 
-    # 2: Test different learning rates
-    learning_rates = [0.01, 0.2, 0.7, 0.9]
-    for rate in learning_rates:
+    # # 2: Test different learning rates
+    # learning_rates = [0.01, 0.2, 0.7, 0.9]
+    # for rate in learning_rates:
+    #     # Read in training data from cross_data
+    #     training_data = read_training_data(
+    #         './assets/cross_data (3 inputs - 2 outputs).csv', input_dimensions, output_dimensions)
+
+    #     # Read and build hidden layer from w1 and b1
+    #     hidden_layer = build_layer(
+    #         './assets/w1 (3 inputs - 11 nodes).csv', './assets/b1 (11 nodes).csv', input_dimensions)
+
+    #     # Read and build output layer from w2 and b2
+    #     output_layer = build_layer('./assets/w2 (from 11 to 2).csv',
+    #                                './assets/b2 (2 output nodes).csv', hidden_layer_dimensions)
+
+    #     # Train network
+    #     errors = []
+    #     lastError = None
+    #     while True:
+    #         # One epoch
+    #         sum_squared_errors = 0
+    #         for sample in training_data:
+    #             sum_squared_errors += forward_pass(sample,
+    #                                                hidden_layer, output_layer)
+    #             backprop(sample, hidden_layer,
+    #                      output_layer, momentum, rate)
+    #         newError = sum_squared_errors / (2 * len(training_data))
+    #         errors.append(newError)
+    #         print('SSE:  ', newError)
+    #         if lastError is not None and lastError - newError < 0.001:
+    #             if rate != 0.01 or len(errors) > 50:
+    #                 break
+    #         lastError = newError
+    #         random.shuffle(training_data)
+    #     print('\n-----\n')
+
+    #     # Plot sum of squared errors
+    #     if rate == 0.01:
+    #         pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'r.-')
+    #         red_line = mlines.Line2D(
+    #             [], [], color='red', marker='.', label='0.01')
+    #     if rate == 0.2:
+    #         pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'g.-')
+    #         green_line = mlines.Line2D(
+    #             [], [], color='green', marker='.', label='0.2')
+    #     if rate == 0.7:
+    #         pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'b.-')
+    #         blue_line = mlines.Line2D(
+    #             [], [], color='blue', marker='.', label='0.7')
+    #     if rate == 0.9:
+    #         pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'y.-')
+    #         yellow_line = mlines.Line2D(
+    #             [], [], color='yellow', marker='.', label='0.9')
+
+    # pyplot.title('Effect of Learning Rate on Training Error')
+    # pyplot.xlabel('Training Epoch')
+    # pyplot.ylabel('Sum of Squared Errors')
+    # pyplot.legend(handles=[red_line, green_line, blue_line, yellow_line])
+    # pyplot.savefig('test_results/learning_rates.png')
+    # pyplot.clf()
+
+    # 3: Change momentum
+    learning_rate = 0.01
+    momentums = [0, 0.6]
+    for momentum in momentums:
         # Read in training data from cross_data
         training_data = read_training_data(
             './assets/cross_data (3 inputs - 2 outputs).csv', input_dimensions, output_dimensions)
@@ -168,39 +234,31 @@ def main():
                 sum_squared_errors += forward_pass(sample,
                                                    hidden_layer, output_layer)
                 backprop(sample, hidden_layer,
-                         output_layer, momentum, rate)
+                         output_layer, momentum, learning_rate)
             newError = sum_squared_errors / (2 * len(training_data))
             errors.append(newError)
             print('SSE:  ', newError)
-            if lastError is not None and lastError - newError < 0.001:
-                if rate != 0.01 or len(errors) > 50:
-                    break
+            if len(errors) > 100:
+                break
             lastError = newError
             random.shuffle(training_data)
         print('\n-----\n')
 
         # Plot sum of squared errors
-        if rate == 0.01:
+        if momentum == 0:
             pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'r.-')
             red_line = mlines.Line2D(
-                [], [], color='red', marker='.', label='0.01')
-        if rate == 0.2:
+                [], [], color='red', marker='.', label='0')
+        if momentum == 0.6:
             pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'g.-')
             green_line = mlines.Line2D(
-                [], [], color='green', marker='.', label='0.2')
-        if rate == 0.7:
-            pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'b.-')
-            blue_line = mlines.Line2D(
-                [], [], color='blue', marker='.', label='0.7')
-        if rate == 0.9:
-            pyplot.plot(numpy.arange(0, len(errors), 1), errors, 'y.-')
-            yellow_line = mlines.Line2D(
-                [], [], color='yellow', marker='.', label='0.9')
+                [], [], color='green', marker='.', label='0.6')
 
+    pyplot.title('Effect of Momentum on Training Error')
     pyplot.xlabel('Training Epoch')
     pyplot.ylabel('Sum of Squared Errors')
-    pyplot.legend(handles=[red_line, green_line, blue_line, yellow_line])
-    pyplot.savefig('test_results/learning_rates.png')
+    pyplot.legend(handles=[red_line, green_line])
+    pyplot.savefig('test_results/momentums.png')
     pyplot.clf()
 
 
