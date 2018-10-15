@@ -1,4 +1,5 @@
 import csv
+import random
 from neuron import Neuron
 
 
@@ -46,4 +47,43 @@ def build_layer(weights_filename, biases_filename, prev_layer_size):
             for bias in row:
                 new_layer[index].set_bias(float(bias))
 
+    return new_layer
+
+
+def read_txt_input(filename):
+    training_data = []
+    with open(filename, 'r') as input_file:
+        lines = input_file.readlines()
+        del lines[0]
+        del lines[0]
+        for line in lines:
+            line = line.strip()
+            clean_line = line.split(' ')
+            clean_line = [x for x in clean_line if x != '']
+            training_data.append(clean_line)
+            for i, value in enumerate(clean_line):
+                if i < 4:
+                    clean_line[i] = float(value)
+                elif int(value) == 1:
+                    clean_line[i] = 0
+                    clean_line.append(1)
+                    break
+                else:
+                    clean_line[i] = 1
+                    clean_line.append(0)
+                    break
+    return training_data
+
+
+def build_custom_layer(prev_layer_size, layer_size):
+    new_layer = []
+
+    for _ in range(layer_size):
+        new_neuron = Neuron()
+        weights = []
+        for _ in range(prev_layer_size):
+            weights.append(random.random() * 2 - 1)
+        new_neuron.set_weights(weights)
+        new_neuron.set_bias(random.random() * 2 - 1)
+        new_layer.append(new_neuron)
     return new_layer
