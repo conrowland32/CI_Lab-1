@@ -152,7 +152,7 @@ def main():
 
     # 2: Test different learning rates
     learning_rates = [0.01, 0.2, 0.7, 0.9]
-    for epochs in [25, 250]:
+    for epochs in [25, 500]:
         for rate in learning_rates:
             # Read in training data from cross_data
             training_data = read_training_data(
@@ -168,7 +168,6 @@ def main():
 
             # Train network
             errors = []
-            lastError = None
             while len(errors) <= epochs:
                 # One epoch
                 sum_squared_errors = 0
@@ -180,8 +179,14 @@ def main():
                 newError = sum_squared_errors / (2 * len(training_data))
                 errors.append(newError)
                 print('SSE:  ', newError)
-                lastError = newError
                 random.shuffle(training_data)
+
+                if rate != 0.01 and len(errors) > 1:
+                    if errors[-2] - errors[-1] < 0.0001:
+                        break
+                if rate == 0.01 and len(errors) > 100:
+                    if errors[-2] - errors[-1] < 0.0001:
+                        break
             print('\n-----\n')
 
             # Plot sum of squared errors
@@ -243,6 +248,13 @@ def main():
                 print('SSE:  ', newError)
                 if len(errors) > epochs:
                     break
+                if momentum == 0.6 and len(errors) > 40:
+                    if errors[-2] - errors[-1] < 0.0001:
+                        break
+                if momentum == 0 and len(errors) > 150:
+                    if errors[-2] - errors[-1] < 0.0001:
+                        break
+
                 random.shuffle(training_data)
             print('\n-----\n')
 
@@ -257,7 +269,7 @@ def main():
                     [], [], color='green', marker='.', label='0.6')
 
         pyplot.title(
-            'Effect of Momentum on Training Error (' + str(epochs) + ' epochs)')
+            'Effect of Momentum on Training Error')
         pyplot.xlabel('Training Epoch')
         pyplot.ylabel('Sum of Squared Errors')
         pyplot.ylim(0.0)
@@ -274,21 +286,19 @@ def main():
     momentum = 0.2
 
     training_data = read_txt_input('./assets/Two_Class_FourDGaussians500.txt')
-    random.shuffle(training_data)
-    size = len(training_data) / 5.0
     split_training_data = []
-    running = 0.0
 
-    while running < len(training_data):
-        split_training_data.append(
-            training_data[int(running):int(running + size)])
-        running += size
+    for i in range(5):
+        class_ones = [training_data[j]
+                      for j in range((i * 100), (i * 100 + 100))]
+        class_twos = [training_data[j]
+                      for j in range((i * 100 + 500), (i * 100 + 600))]
+        split_training_data.append(class_ones + class_twos)
 
     hidden_sizes = [4, 8, 16]
     for size in hidden_sizes:
         # Train network
         total_matrix = numpy.array([[0, 0], [0, 0]])
-        average_errors = [0] * 50
         for fold in range(5):
             # Build a new hidden layer with random weights and biases
             hidden_layer = build_custom_layer(
@@ -315,7 +325,7 @@ def main():
                     split_training_data[2] + split_training_data[3]
 
             errors = []
-            for _ in range(50):
+            while True:
                 # One epoch
                 sum_squared_errors = 0
                 random.shuffle(training_data)
@@ -326,10 +336,8 @@ def main():
                              momentum, learning_rate)
                 new_error = sum_squared_errors / (2 * len(training_data))
                 errors.append(new_error)
-
-            for i, error in enumerate(average_errors):
-                updated_error = (error * fold + errors[i]) / (fold + 1)
-                average_errors[i] = updated_error
+                if len(errors) > 1 and errors[-2] - errors[-1] < 0.001:
+                    break
 
             num_right = 0
             conf_matrix = numpy.array([[0, 0], [0, 0]])
@@ -350,8 +358,8 @@ def main():
                             './test_results/cross_validation/conf_matrix_fold_' + str(fold+1))
 
         # Plot sum of squared errors
-        pyplot.plot(numpy.arange(0, len(average_errors), 1),
-                    average_errors, 'b.-')
+        pyplot.plot(numpy.arange(0, len(errors), 1),
+                    errors, 'b.-')
         pyplot.title('Training Errors: ' +
                      str(size) + ' Hidden Neurons')
         pyplot.xlabel('Training Epoch')
@@ -369,18 +377,20 @@ def main():
 
 def plot_matrix(conf_matrix, title, output_filename):
     # Build confusion matrix
-    conf_matrix = conf_matrix.astype(
-        'float') / (conf_matrix.sum(axis=1)[:, numpy.newaxis])
     color_map = pyplot.cm.Blues
-    pyplot.imshow(conf_matrix, interpolation='nearest',
-                  cmap=color_map, vmin=0.0, vmax=1.0)
+    if max(conf_matrix[0] > 100):
+        pyplot.imshow(conf_matrix, interpolation='nearest',
+                      cmap=color_map, vmin=0, vmax=500)
+    else:
+        pyplot.imshow(conf_matrix, interpolation='nearest',
+                      cmap=color_map, vmin=0, vmax=100)
     pyplot.colorbar()
     tick_marks = numpy.arange(2)
     pyplot.xticks(tick_marks, [0, 1])
     pyplot.yticks(tick_marks, [0, 1])
     thresh = conf_matrix.max() / 2.
     for i, j in itertools.product(range(conf_matrix.shape[0]), range(conf_matrix.shape[1])):
-        pyplot.text(j, i, format(conf_matrix[i, j], '.2f'), horizontalalignment='center',
+        pyplot.text(j, i, format(conf_matrix[i, j], '.0f'), horizontalalignment='center',
                     color='white' if conf_matrix[i, j] > thresh else 'black')
 
     pyplot.title(title)
